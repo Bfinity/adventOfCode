@@ -5,10 +5,8 @@ val directionString = "R5, L2, L1, R1, R3, R3, L3, R3, R4, L2, R4, L4, R4, R3, L
 
 day1.findSolutionForDay1(directionString)
 
-val directions = day1.convertDirectionsToArray("R8, R4, R4, R8")
+val directions = "R8, R4, R4, R8"
 val solutionDirections = day1.convertDirectionsToArray(directionString)
 val start = day1.North(0,0)
-day1.trackPlacesVisited(start, directions, List())
-val location = day1.findFirstPlaceVisitedTwice(day1.trackPlacesVisitedFromStart(start, solutionDirections , List()))
-day1.distanceFromStartingLocation(start, day1.East(4,0))
-day1.distanceFromStartingLocation(start, day1.South(-66, -121))
+val location = day1.findFirstPlaceVisitedTwice(day1.trackPlacesVisited(start, solutionDirections , List()))
+day1.findSolutionForDay1Part2(directions)

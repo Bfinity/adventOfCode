@@ -59,6 +59,13 @@ class Day1 {
     distanceFromStartingLocation(start, move(start, convertDirectionsToArray(directionsString)))
   }
 
+  def findSolutionForDay1Part2(directionsString: String) : Int = {
+    val start = North(0,0)
+    val list = trackPlacesVisited(start, convertDirectionsToArray(directionsString), List())
+    val place = compareLocations(list)
+    distanceFromStartingLocations(convertCardinalDirectionIntoLocation(start), place)
+  }
+
   def convertDirectionsToArray(directionsString: String): List[Directions] ={
     val directionsList = directionsString.replaceAll(" ", "").split(",").toList
     stringToDirection(directionsList, List())
@@ -74,12 +81,16 @@ class Day1 {
     case a :: yy => move(currentDirection.turn(a.look, a.walk), yy)
   }
 
-  def distanceFromStartingLocation(startingPoint: CardinalDirection, currentPoint: CardinalDirection): Int ={
+  private def distanceFromStartingLocation(startingPoint: CardinalDirection, currentPoint: CardinalDirection): Int ={
     Math.abs((startingPoint.horizontal + currentPoint.horizontal)) + Math.abs((startingPoint.vertical + currentPoint.vertical))
   }
 
-  def trackPlacesVisitedFromStart(start: CardinalDirection, steps: List[Directions], list: List[LocationsVisited]): List[LocationsVisited] ={
-    trackPlacesVisited(start, steps, list).sortBy(l => l.x)
+  private def distanceFromStartingLocations(start: LocationsVisited, end: LocationsVisited): Int = {
+    Math.abs(start.x + end.x) + Math.abs(start.y + end.y)
+  }
+
+  private def convertCardinalDirectionIntoLocation(cardinalDirection: CardinalDirection): LocationsVisited ={
+    LocationsVisited(cardinalDirection.horizontal, cardinalDirection.vertical)
   }
 
   def trackPlacesVisited(prev: CardinalDirection, steps: List[Directions], list: List[LocationsVisited]): List[LocationsVisited] = steps match{
@@ -92,23 +103,29 @@ class Day1 {
     else captureHorizontal(current.horizontal, current.vertical, List())
   }
 
-  def captureVertical(x: Int, y: Int, list: List[LocationsVisited]): List[LocationsVisited] = y match{
+  private def captureVertical(x: Int, y: Int, list: List[LocationsVisited]): List[LocationsVisited] = y match{
     case 0 => list ::: List(LocationsVisited(x,y))
     case _ => List(LocationsVisited(x, y)) ::: (if(y>0) captureVertical(x, y-1, list) else captureVertical(x, y+1, list))
   }
 
-  def captureHorizontal(x: Int, y: Int, list: List[LocationsVisited]): List[LocationsVisited] = x match{
+  private def captureHorizontal(x: Int, y: Int, list: List[LocationsVisited]): List[LocationsVisited] = x match{
     case 0 => list ::: List(LocationsVisited(x,y))
     case x => List(LocationsVisited(x, y)) ::: (if(x > 0) captureHorizontal(x-1, y, list) else captureHorizontal(x+1, y, list))
   }
 
-  def findFirstPlaceVisitedTwice(placesVisited: List[LocationsVisited]): Location ={
-    compareLocations(placesVisited.head, placesVisited.tail)
+  def findFirstPlaceVisitedTwiceByString(directionString: String): LocationsVisited ={
+    val start = North(0,0)
+    val directionsArray = convertDirectionsToArray(directionString)
+    val trackedPlace = trackPlacesVisited(start, directionsArray, List())
+    compareLocations(trackedPlace)
   }
 
-  def compareLocations(location: LocationsVisited, list: List[LocationsVisited]): Location = list match {
-    case List() => NilLocation()
-    case a :: yy => if(list.contains(location)) location else compareLocations(a, yy)
+  def compareLocations(list: List[LocationsVisited]): LocationsVisited = {
+    def traverseList(location: LocationsVisited, list: List[LocationsVisited]): LocationsVisited = list match {
+      case List() => LocationsVisited(1, 1)
+      case a :: yy => if (list.contains(location)) location else traverseList(a, yy)
+    }
+    traverseList(list.head, list.tail)
   }
 
 
